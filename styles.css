@@ -17,14 +17,25 @@ header {
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    margin: 0 auto;
+}
+
+div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .title h1{
     font-size: 5em;
     margin-bottom: 15px;
-    color:#C58940
+    color:#C58940;
 }
 
+.turn {
+    font-size: 2em;
+    color:#C58940;
+}
 /* Middle Section */
 
 .middle {
@@ -139,7 +150,9 @@ header {
     font-size: 30px;
     background-color: #FAEAB1;
     color: #C58940;
+    text-align: center;
 }
+
 
 .reset-space{
     display: flex;

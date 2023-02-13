@@ -40,8 +40,6 @@ For this version, the king will only have the bonus ability to capture and move 
 
 2. Define the required variables:
     * define a variable that will say whoWon which is initialized with '' and will gain array[0] or array[1] depending on who wins
-    * define 2 variables that will state total black or red pieces on either side
-        - redHave or blkHave
 
 3. Select and Save caches elements
     * Each element with a class of 'red', and same id will saved into redPieces array into the compatible object, 
