@@ -303,3 +303,5 @@ function fullReset() {
 // if possible Movement for all blk is false then they lose
 // When win logic is implemented and someone wins, put the message board up
 // Implement if piece becomes king 
+
+// BUG where it can move backwards then change colour
