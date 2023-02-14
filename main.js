@@ -90,10 +90,10 @@ function mainFunc(evt) {
                     let pieceY = chosen.location[1]
                     x = parseInt(x)
                     y = parseInt(y)
-                    if (chosen.color === "red" && chosen.king === true) {
+                    if (chosen.color === "red" && chosen.king) {
                         eatingUpwards(x, y, pieceX, pieceY, chosen)
                     }
-                    else if (chosen.color === "black" && chosen.king === true) {
+                    else if (chosen.color === "black" && chosen.king) {
                         eatingDownwards(x, y, pieceX, pieceY, chosen)
                     }
                     else if (chosen.color === "black"){
@@ -106,7 +106,7 @@ function mainFunc(evt) {
             }
             // Regular Movement of 
             else if (chosen.color === "red") {
-                if (chosen.king === true){
+                if (chosen.king){
                     movingUpwards(x, y, chosen)
                 }
                 else{
@@ -114,7 +114,7 @@ function mainFunc(evt) {
                 }   
             }
             else if (chosen.color === "black") {
-                if (chosen.king === true) {
+                if (chosen.king) {
                     movingDownwards(x, y, chosen)
                 }
                 else {
@@ -139,11 +139,12 @@ function mainFunc(evt) {
             if (!dontUse) {
                 clear()
                 chosen = get('red', evt.target) 
-            }   
+            }
         }
+
     let possibleRedMoves = 0
     let possibleBlkMoves = 0
-    // Check Each Red Piece for possible moves
+
     if (redLostPieces.length !== redPieces.length) {
         redPieces.forEach(function(piece) {
             possibleRedMoves += checkDownwards(piece, "red")
@@ -155,21 +156,19 @@ function mainFunc(evt) {
             possibleBlkMoves += checkUpwards(piece, "black")
         })        
     }
-
-
-
-    if (possibleRedMoves === 0 || redLostPieces.length === redPieces.length) {
+    // || blkLostPieces.length === blkPieces.length
+    // || redLostPieces.length === redPieces.length
+    if (possibleRedMoves === 0) {
         msgBoard.innerHTML = "<p>PLAYER 1 WINS!</p>"
         msgBoard.style.display = "block"
         gameOn = false
 
     }
-    else if (possibleBlkMoves === 0 || blkLostPieces.length === blkPieces.length) {
+    else if (possibleBlkMoves === 0) {
         msgBoard.innerHTML = "<p>PLAYER 2 WINS!</p>"
         msgBoard.style.display = "block"
         gameOn = false
     }         
-
 }
 
 
@@ -441,6 +440,7 @@ function eatingUpwards(x, y, pieceX, pieceY, chosen) {
             }
         }
     }
+    clear()
 }
 
 function eatingDownwards(x, y, pieceX, pieceY, chosen) {
@@ -468,6 +468,7 @@ function eatingDownwards(x, y, pieceX, pieceY, chosen) {
             }
         }
     }
+    clear()
 }
 
 function movingUpwards(x, y, chosen) {
@@ -493,3 +494,7 @@ function movingDownwards(x, y, chosen) {
     }
     clear()
 }
+
+// Implement double jumping and Possibly King full diagonal movement
+// Work on making code neater
+// Work on making CSS and HTML nicer too
