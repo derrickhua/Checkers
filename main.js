@@ -208,6 +208,8 @@ function checkDownwards(piece, color, type) {
     let possibleY = [(pieceY - 1), (pieceY + 1)]
     if (pieceX === 7 && piece.color === "red") {
         piece.king = true
+        piece.docEl.style.backgroundColor = "lightcoral"
+        piece.docEl.textContent = "K"
         if (chosen.Ate) {
             possibleRedMoves += checkUpwards(piece, "red", "ate")
         }
@@ -277,6 +279,8 @@ function checkUpwards(piece, color, type) {
     // if the front left space is not undefined
     if (pieceX === 0 && piece.color === "black") {
         piece.king = true
+        piece.docEl.style.color = "white"
+        piece.docEl.textContent = "K"
         if (chosen.ate) {
             possibleBlkMoves += checkDownwards(piece, "black", "ate")
         }
