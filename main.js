@@ -8,6 +8,7 @@ class Man {
         this.moving = false
         this.id = ''
         this.docEl = ''
+        this.ate = false
     }
 
     createPiece(color) {
@@ -27,7 +28,7 @@ const startPositionsBlk = ["51", "53", "55", "57", "60", "62", "64", '66', "71",
 const allSpaces = ["00", "02", "04", "06", "11", "13", "15", "17", "20", "22", "24", "26", 
     "31", "33", "35", "37", "40", "42", "44", "46", 
     "51", "53", "55", "57", "60", "62", "64", "66", "71", "73", "75", "77"]
-
+const turns = []
 const places = [
     [null, null, null, null, null, null, null, null], 
     [null, null, null, null, null, null, null, null], 
@@ -71,6 +72,9 @@ function mainFunc(evt) {
         if (!evt.target.hasAttribute('id')) return
         // if a man is clicked again, remove
         if (evt.target.id === chosen.id) {
+            if (chosen.ate) {
+                changeTurn()
+            }
             clear()
         }
         // what do after a piece is activated
@@ -90,17 +94,37 @@ function mainFunc(evt) {
                     let pieceY = chosen.location[1]
                     x = parseInt(x)
                     y = parseInt(y)
-                    if (chosen.color === "red" && chosen.king) {
-                        eatingUpwards(x, y, pieceX, pieceY, chosen)
+                    if (chosen.color === "red") {
+                        if (chosen.king){
+                            eatingUpwards(x, y, pieceX, pieceY, chosen) 
+                            if (checkUpwards(chosen, chosen.color, "ate") > 0) {
+                                changeTurn()
+                                chosen.moving = true
+                            }
+                        }
+                        else {
+                            eatingDownwards(x, y, pieceX, pieceY, chosen)  
+                            if (checkDownwards(chosen, chosen.color, "ate") > 0) {
+                                changeTurn()
+                                chosen.moving = true
+                            }
+                        }
                     }
-                    else if (chosen.color === "black" && chosen.king) {
-                        eatingDownwards(x, y, pieceX, pieceY, chosen)
-                    }
-                    else if (chosen.color === "black"){
-                        eatingUpwards(x, y, pieceX, pieceY, chosen)
-                    }
-                    else if (chosen.color === "red") {
-                        eatingDownwards(x, y, pieceX, pieceY, chosen)
+                    else if (chosen.color === "black") {
+                        if (chosen.king) {
+                            eatingDownwards(x, y, pieceX, pieceY, chosen) 
+                            if (checkDownwards(chosen, chosen.color, "ate") > 0) {
+                                changeTurn()
+                                chosen.moving = true
+                            }
+                        } else {
+                            eatingUpwards(x, y, pieceX, pieceY, chosen)
+                            if (checkUpwards(chosen, chosen.color, "ate") > 0) {
+                                changeTurn()
+                                chosen.moving = true
+                            }
+                        }
+                        
                     }
                 } 
             }
@@ -144,20 +168,19 @@ function mainFunc(evt) {
 
     let possibleRedMoves = 0
     let possibleBlkMoves = 0
-
     if (redLostPieces.length !== redPieces.length) {
         redPieces.forEach(function(piece) {
-            possibleRedMoves += checkDownwards(piece, "red")
+            possibleRedMoves += checkDownwards(piece, "red", "regular")
+            
         })        
     }
 
     if (blkLostPieces.length !== blkPieces.length) {
         blkPieces.forEach(function(piece) {
-            possibleBlkMoves += checkUpwards(piece, "black")
+            possibleBlkMoves += checkUpwards(piece, "black", "regular")
         })        
     }
-    // || blkLostPieces.length === blkPieces.length
-    // || redLostPieces.length === redPieces.length
+
     if (possibleRedMoves === 0) {
         msgBoard.innerHTML = "<p>PLAYER 1 WINS!</p>"
         msgBoard.style.display = "block"
@@ -169,18 +192,28 @@ function mainFunc(evt) {
         msgBoard.style.display = "block"
         gameOn = false
     }         
+
 }
 
 
-function checkDownwards(piece, color) {
+
+
+
+function checkDownwards(piece, color, type) {
     let possibleRedMoves = 0
+    let possibleEat = 0
     let pieceX = piece.location[0]
     let pieceY = piece.location[1]
     let possibleX = pieceX + 1
     let possibleY = [(pieceY - 1), (pieceY + 1)]
     if (pieceX === 7 && piece.color === "red") {
         piece.king = true
-        possibleRedMoves += checkUpwards(piece, "red")
+        if (chosen.Ate) {
+            possibleRedMoves += checkUpwards(piece, "red", "ate")
+        }
+        else {
+            possibleRedMoves += checkUpwards(piece, "red", "regular")
+        }
         return possibleRedMoves
     }
     // if the front left space is not undefined
@@ -196,11 +229,12 @@ function checkDownwards(piece, color) {
             if (places[possibleX][possibleY[0]].color === color){
                 //get the space diagonal to this one
                 let newX = possibleX + 1
-                let newY = possibleY - 1
+                let newY = possibleY[0] - 1
                 // check if that space exists and if it is empty or not
                 if (newY >= 0 && places[newX][newY] === null) {
                     // if empty increase possibleRedMoves
                     possibleRedMoves += 1
+                    possibleEat += 1
                 }
             }
 
@@ -215,19 +249,27 @@ function checkDownwards(piece, color) {
         else if (places[possibleX][possibleY[1]] !== null){
             if (places[possibleX][possibleY[1]].color === color){
                 let newX = possibleX + 1
-                let newY = possibleY + 1
+                let newY = possibleY[1] + 1
                 if (newY >= 0 && places[newX][newY] === null) {
                     possibleRedMoves += 1
+                    possibleEat += 1
                 }
             }
 
         }
     }
-    return possibleRedMoves
+    if (type === "ate"){
+        return possibleEat
+    }
+    else{
+        return possibleRedMoves
+    }
+    
 }
 
-function checkUpwards(piece, color) {
+function checkUpwards(piece, color, type) {
     let possibleBlkMoves = 0
+    let possibleEat = 0
     let pieceX = parseInt(piece.location[0])
     let pieceY = parseInt(piece.location[1])
     let possibleX = pieceX - 1
@@ -235,7 +277,12 @@ function checkUpwards(piece, color) {
     // if the front left space is not undefined
     if (pieceX === 0 && piece.color === "black") {
         piece.king = true
-        possibleBlkMoves += checkDownwards(piece, "black")
+        if (chosen.ate) {
+            possibleBlkMoves += checkDownwards(piece, "black", "ate")
+        }
+        else {
+            possibleBlkMoves += checkDownwards(piece, "black", "regular")
+        }
         return possibleBlkMoves
     }
     if (places[possibleX][possibleY[0]] !== undefined && possibleY[0] !== undefined){
@@ -244,11 +291,12 @@ function checkUpwards(piece, color) {
             possibleBlkMoves += 1
         }
         else if (places[possibleX][possibleY[0]] !== null){
-            if (places[possibleX][possibleY[0]].color === color){
+            if (places[possibleX][possibleY[0]].color !== color){
                 let newX = possibleX - 1
-                let newY = possibleY - 1
+                let newY = possibleY[0] - 1
                 if (newY >= 0 && places[newX][newY] === null) {
                     possibleBlkMoves += 1
+                    possibleEat += 1
                 }
             }
         }
@@ -258,17 +306,23 @@ function checkUpwards(piece, color) {
             possibleBlkMoves += 1
         }
         else if (places[possibleX][possibleY[1]] !== null){
-            if (places[possibleX][possibleY[1]].color === color){
+            if (places[possibleX][possibleY[1]].color !== color){
                 let newX = possibleX - 1
-                let newY = possibleY + 1
+                let newY = possibleY[1] + 1
                 if (newY >= 0 && places[newX][newY] === null) {
                     possibleBlkMoves += 1
+                    possibleEat += 1
                 }
             }
 
         }
     }
-    return possibleBlkMoves
+    if (type === "ate"){
+        return possibleEat
+    }
+    else{
+        return possibleBlkMoves
+    }
 }
 
 function clear() {
@@ -334,8 +388,7 @@ function remove(x, y, color) {
 }
 
 function render() {
-    // startPositionsRed.length && startPositionsBlk.length
-    for (let i = 0; i < 1; i++) {
+    for (let i = 0; i < startPositionsRed.length; i++) {
         let newMan = new Man()
         newMan.createPiece('#FF4C4C')
         newMan.color = 'red'
@@ -351,7 +404,7 @@ function render() {
 
 
     }
-    for (let i = 0; i < 1; i++) {
+    for (let i = 0; i < startPositionsBlk.length; i++) {
         let newMan = new Man()
         newMan.createPiece("black")
         newMan.color = 'black'
@@ -378,6 +431,8 @@ function changeTurn() {
         turn.textContent = "Player 1/ BLK"
     }
 }
+
+
 
 function resetTurn() {
     let turn = document.querySelector(".turn")
@@ -414,7 +469,6 @@ function fullReset() {
     resetTurn()
     updateScore()
     msgBoard.style.display = "none"
-    console.log("reset")
     gameOn = true
 }
 
@@ -440,6 +494,7 @@ function eatingUpwards(x, y, pieceX, pieceY, chosen) {
             }
         }
     }
+    chosen.ate = true
     clear()
 }
 
@@ -468,6 +523,7 @@ function eatingDownwards(x, y, pieceX, pieceY, chosen) {
             }
         }
     }
+    chosen.ate = true
     clear()
 }
 
@@ -480,6 +536,7 @@ function movingUpwards(x, y, chosen) {
         }
     
     }
+    chosen.ate = false
     clear() 
 }
 
@@ -492,6 +549,7 @@ function movingDownwards(x, y, chosen) {
         }
     
     }
+    chosen.ate = false
     clear()
 }
 
