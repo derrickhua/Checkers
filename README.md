@@ -35,7 +35,7 @@ For this version, the king will only have the bonus ability to capture and move 
 # Getting Started
 
 ## Link to the Game
-[Link text](https://derrickhua.github.io/Checkers/)
+[GAME HERE](https://derrickhua.github.io/Checkers/)
 
 * Player 1/ BLK will always go first. 
 * It's as simple as clicking on a piece and clicking on a space.
